@@ -4,6 +4,8 @@ import { getBookById, createBook, updateBook } from "../api/bookService";
 
 function BookForm() {
   const [book, setBook] = useState({ title: "", author: "", genre: "", publicationYear: "" });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -12,11 +14,15 @@ function BookForm() {
   }, [id]);
 
   const fetchBook = async (id) => {
+    setLoading(true);
+    setError("");
     try {
       const data = await getBookById(id);
       setBook(data);
     } catch (err) {
-      console.error("Failed to fetch book:", err);
+      setError("Failed to fetch book details.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -27,32 +33,76 @@ function BookForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    setError("");
     try {
       if (id) await updateBook(id, book);
       else await createBook(book);
       navigate("/");
     } catch (err) {
-      console.error("Failed to save book:", err);
+      setError("Failed to save book. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div>
-      <h1>{id ? "Edit Book" : "Add Book"}</h1>
-      <form onSubmit={handleSubmit}>
-        <input name="title" placeholder="Title" value={book.title} onChange={handleChange} required />
-        <input name="author" placeholder="Author" value={book.author} onChange={handleChange} required />
-        <input name="genre" placeholder="Genre" value={book.genre} onChange={handleChange} />
-        <input
-          name="publicationYear"
-          placeholder="Year"
-          type="number"
-          value={book.publicationYear}
-          onChange={handleChange}
-          required
-        />
-        <button type="submit">{id ? "Update" : "Create"}</button>
-      </form>
+    <div style={{ maxWidth: "500px", margin: "2rem auto", padding: "2rem", border: "1px solid #ccc", borderRadius: "8px" }}>
+      <h1 style={{ textAlign: "center", marginBottom: "1rem" }}>{id ? "Edit Book" : "Add Book"}</h1>
+      {error && <p style={{ color: "red", marginBottom: "1rem" }}>{error}</p>}
+      {loading ? (
+        <p style={{ textAlign: "center" }}>Loading...</p>
+      ) : (
+        <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+          <input
+            name="title"
+            placeholder="Title"
+            value={book.title}
+            onChange={handleChange}
+            required
+            style={{ padding: "0.5rem", fontSize: "1rem", borderRadius: "4px", border: "1px solid #ccc" }}
+          />
+          <input
+            name="author"
+            placeholder="Author"
+            value={book.author}
+            onChange={handleChange}
+            required
+            style={{ padding: "0.5rem", fontSize: "1rem", borderRadius: "4px", border: "1px solid #ccc" }}
+          />
+          <input
+            name="genre"
+            placeholder="Genre"
+            value={book.genre}
+            onChange={handleChange}
+            style={{ padding: "0.5rem", fontSize: "1rem", borderRadius: "4px", border: "1px solid #ccc" }}
+          />
+          <input
+            name="publicationYear"
+            placeholder="Year"
+            type="number"
+            value={book.publicationYear}
+            onChange={handleChange}
+            required
+            style={{ padding: "0.5rem", fontSize: "1rem", borderRadius: "4px", border: "1px solid #ccc" }}
+          />
+          <button
+            type="submit"
+            disabled={loading}
+            style={{
+              padding: "0.75rem",
+              fontSize: "1rem",
+              backgroundColor: "#007bff",
+              color: "white",
+              border: "none",
+              borderRadius: "4px",
+              cursor: loading ? "not-allowed" : "pointer",
+            }}
+          >
+            {id ? "Update" : "Create"}
+          </button>
+        </form>
+      )}
     </div>
   );
 }
