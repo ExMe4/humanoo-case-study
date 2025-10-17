@@ -1,6 +1,6 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import BookList from './pages/BookList';
-import BookForm from './pages/BookForm';
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import BookList from "./pages/BookList";
+import BookForm from "./pages/BookForm";
 
 function App() {
   return (
