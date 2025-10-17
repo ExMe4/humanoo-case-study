@@ -14,6 +14,7 @@ function App() {
             <Route path="/" element={<BookList />} />
             <Route path="/books/new" element={<BookForm />} />
             <Route path="/books/:id/edit" element={<BookForm />} />
+            <Route path="*" element={<h1>404 - Page Not Found</h1>} />
           </Routes>
         </Router>
       </BookProvider>
