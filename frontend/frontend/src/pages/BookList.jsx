@@ -1,40 +1,21 @@
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { getAllBooks, deleteBook } from "../api/bookService";
+import { useContext, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { BookContext } from "../context/BookContext";
 
 function BookList() {
-  const [books, setBooks] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const { books, loading, error, fetchBooks, removeBook } = useContext(BookContext);
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const handleDelete = (id) => {
+    if (window.confirm("Are you sure you want to delete this book?")) {
+      removeBook(id);
+    }
+  };
 
   useEffect(() => {
     fetchBooks();
-  }, []);
-
-  const fetchBooks = async () => {
-    setLoading(true);
-    setError("");
-    try {
-      const data = await getAllBooks();
-      setBooks(data);
-    } catch (err) {
-      setError("Failed to fetch books.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleDelete = async (id) => {
-    if (window.confirm("Are you sure you want to delete this book?")) {
-      try {
-        await deleteBook(id);
-        setBooks(books.filter((b) => b.id !== id));
-      } catch (err) {
-        setError("Failed to delete book.");
-      }
-    }
-  };
+  }, [location.pathname]);
 
   return (
     <div

@@ -1,50 +1,45 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { getBookById, createBook, updateBook } from "../api/bookService";
+import { BookContext } from "../context/BookContext";
 
 function BookForm() {
-  const [book, setBook] = useState({ title: "", author: "", genre: "", publicationYear: "" });
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const { id } = useParams();
-  const navigate = useNavigate();
+  const { addBook, editBook, getBook } = useContext(BookContext);
+    const [book, setBook] = useState({ title: "", author: "", genre: "", publicationYear: "" });
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
+    const { id } = useParams();
+    const navigate = useNavigate();
 
-  useEffect(() => {
-    if (id) fetchBook(id);
-  }, [id]);
+    useEffect(() => {
+      if (id) {
+        setLoading(true);
+        getBook(id)
+          .then((data) => setBook(data))
+          .catch(() => setError("Failed to fetch book details."))
+          .finally(() => setLoading(false));
+      }
+    }, [id]);
 
-  const fetchBook = async (id) => {
-    setLoading(true);
-    setError("");
-    try {
-      const data = await getBookById(id);
-      setBook(data);
-    } catch (err) {
-      setError("Failed to fetch book details.");
-    } finally {
-      setLoading(false);
-    }
-  };
+    const handleChange = (e) => setBook({ ...book, [e.target.name]: e.target.value });
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setBook({ ...book, [name]: value });
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError("");
-    try {
-      if (id) await updateBook(id, book);
-      else await createBook(book);
-      navigate("/");
-    } catch (err) {
-      setError("Failed to save book. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
+    const handleSubmit = async (e) => {
+      e.preventDefault();
+      setLoading(true);
+      setError("");
+      try {
+        if (id) {
+          await editBook(id, book);
+        } else {
+          await addBook(book);
+        }
+        navigate("/");
+      } catch {
+        setError("Failed to save book. Please try again.");
+      } finally {
+        setLoading(false);
+      }
+    };
 
   return (
     <div
@@ -55,7 +50,7 @@ function BookForm() {
         alignItems: "center",
         justifyContent: "flex-start",
         paddingTop: "2rem",
-        paddingLeft: "66rem",
+        paddingLeft: "65rem",
       }}
     >
       <div
