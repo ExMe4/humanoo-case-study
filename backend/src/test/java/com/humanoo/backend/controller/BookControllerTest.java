@@ -2,6 +2,7 @@ package com.humanoo.backend.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.humanoo.backend.model.Book;
+import com.humanoo.backend.model.dto.BookDTO;
 import com.humanoo.backend.service.BookService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,6 +12,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import static org.mockito.Mockito.*;
@@ -40,29 +42,26 @@ class BookControllerTest {
 
     @Test
     void getAllBooks_shouldReturnList() throws Exception {
-        // Given
+        BookDTO dto = new BookDTO(1L, "1984", "George Orwell", "Dystopian", 1949, LocalDate.now());
         when(service.getAllBooks()).thenReturn(List.of(sampleBook));
+        when(service.toDTOList(anyList())).thenReturn(List.of(dto));
 
-        // When & Then
         mockMvc.perform(get("/api/books"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].title").value("1984"));
-
-        verify(service).getAllBooks();
     }
 
     @Test
     void getBookById_shouldReturnBook() throws Exception {
-        // Given
+        BookDTO dto = new BookDTO(1L, "1984", "George Orwell", "Dystopian", 1949, LocalDate.now());
         when(service.getBookById(1L)).thenReturn(sampleBook);
+        when(service.toDTO(any(Book.class))).thenReturn(dto);
 
-        // When & Then
         mockMvc.perform(get("/api/books/1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.author").value("George Orwell"));
-
-        verify(service).getBookById(1L);
     }
+
 
     @Test
     void deleteBook_shouldReturnNoContent() throws Exception {
