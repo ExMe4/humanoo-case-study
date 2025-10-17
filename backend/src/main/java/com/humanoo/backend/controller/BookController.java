@@ -1,6 +1,7 @@
 package com.humanoo.backend.controller;
 
 import com.humanoo.backend.model.Book;
+import com.humanoo.backend.model.dto.BookDTO;
 import com.humanoo.backend.service.BookService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -21,29 +22,31 @@ public class BookController {
     }
 
     @GetMapping
-    public List<Book> getAllBooks() {
-        return service.getAllBooks();
+    public List<BookDTO> getAllBooks() {
+        return service.toDTOList(service.getAllBooks());
     }
 
     @GetMapping("/{id}")
-    public Book getBookById(@PathVariable Long id) {
-        return service.getBookById(id);
+    public BookDTO getBookById(@PathVariable Long id) {
+        return service.toDTO(service.getBookById(id));
     }
 
     @GetMapping("/search")
-    public List<Book> searchBooks(@RequestParam String query) {
-        return service.searchByTitle(query);
+    public List<BookDTO> searchBooks(@RequestParam String query) {
+        return service.toDTOList(service.searchByTitle(query));
     }
 
     @PostMapping
-    public ResponseEntity<Book> createBook(@Valid @RequestBody Book book) {
+    public ResponseEntity<BookDTO> createBook(@Valid @RequestBody Book book) {
         Book created = service.createBook(book);
-        return ResponseEntity.created(URI.create("/api/books/" + created.getId())).body(created);
+        return ResponseEntity.created(URI.create("/api/books/" + created.getId()))
+                .body(service.toDTO(created));
     }
 
     @PutMapping("/{id}")
-    public Book updateBook(@PathVariable Long id, @Valid @RequestBody Book book) {
-        return service.updateBook(id, book);
+    public BookDTO updateBook(@PathVariable Long id, @Valid @RequestBody Book book) {
+        Book updated = service.updateBook(id, book);
+        return service.toDTO(updated);
     }
 
     @DeleteMapping("/{id}")
