@@ -34,7 +34,7 @@ function BookList() {
       }}
     >
       <div style={{ maxWidth: "900px", width: "100%", margin: "0 auto", padding: "1rem", display: "flex", flexDirection: "column", alignItems: "center" }}>
-        <h1 style={{ textAlign: "center", marginBottom: "1rem" }}>Book Library</h1>
+        <h1 style={{ textAlign: "center", marginBottom: "5rem" }}>Book Library</h1>
         {error && <p style={{ color: "red", marginBottom: "1rem" }}>{error}</p>}
         <button
           onClick={() => navigate("/books/new")}
